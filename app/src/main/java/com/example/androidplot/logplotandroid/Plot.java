@@ -19,7 +19,6 @@ package com.example.androidplot.logplotandroid;
 import android.graphics.Paint;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.view.ViewTreeObserver;
 
 import java.util.ArrayList;
 
@@ -27,7 +26,7 @@ import java.util.ArrayList;
  * Created by achaves on 13-05-2016.
  *
  */
-public abstract class Plot extends AsyncTask<Object, Void, Void> {
+public class Plot extends AsyncTask<Object, Void, Void> {
 
     private final String TAG = "Plot";
 
@@ -76,6 +75,8 @@ public abstract class Plot extends AsyncTask<Object, Void, Void> {
                     }
                 }
             }
+        } else {
+            Log.e(TAG, "No data found");
         }
 
         return xMinValue;
@@ -176,9 +177,43 @@ public abstract class Plot extends AsyncTask<Object, Void, Void> {
         this.execute(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
-    public abstract void gridDefinition();
+    public void gridDefinition(){
+        getGrid().apply(); // defines axis, rulers and labels
+    }
 
-    public abstract void plotDefinition();
+    public void plotDefinition(){
+        if (getSeriesList().size() > 0) {
+            for (SeriesXY series : getSeriesList()) {
+
+                ChartLineType lineType = series.getLineType();
+
+                switch (lineType){
+                    case LINE:
+                        getGrid().plotSeriesLine(series);
+                        break;
+                    case DASHED_LINE:
+                        getGrid().plotSeriesDashedLine(series);
+                        break;
+                    case BEZIER_QUADRATIC:
+                        getGrid().plotSeriesBezierQuadratic(series);
+                        break;
+                    case BEZIER_CUBIC:
+                        getGrid().plotSeriesBezierCubic(series);
+                        break;
+                    case POINTS:
+                        getGrid().plotSeriesPoints(series);
+                }
+
+                if (series.isToWritePointCoordinate()) { // the point coordinate
+                    getGrid().writeSeriesPointCoordinate(series);
+                }
+
+                if (series.isToWritePointLabel()) { // the point label
+                    getGrid().writeSeriesPointText(series);
+                }
+            }
+        }
+    }
 
     public Grid getGrid() {
         return grid;

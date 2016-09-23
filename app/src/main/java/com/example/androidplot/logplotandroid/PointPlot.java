@@ -27,8 +27,8 @@ public class PointPlot implements Cloneable {
     private Double y;
     private int color;
     private String text = "";
-    private float testVOffset = 0f;
-    private float testHOffset = 0f;
+    private float textVOffset = 0f;
+    private float textHOffset = 0f;
     private int textColor;
     private float textSize; // sp units
     private float size = 1; // point size dp
@@ -94,22 +94,22 @@ public class PointPlot implements Cloneable {
 
     /** @return  vertical text offset to point's center in dp units */
     public float getTextVOffset() {
-        return testVOffset;
+        return textVOffset;
     }
 
     /** @param testVOffset vertical text offset to point's center in dp units */
     public void setTextVOffset(float testVOffset) {
-        this.testVOffset = testVOffset;
+        this.textVOffset = testVOffset;
     }
 
     /** @return horizontal text offset to to point's center in dp units */
     public float getTextHOffset() {
-        return testHOffset;
+        return textHOffset;
     }
 
     /** @param testHOffset  horizontal text offset to to point's center in dp units */
     public void setTextHOffset(float testHOffset) {
-        this.testHOffset = testHOffset;
+        this.textHOffset = testHOffset;
     }
 
     public int getColor() {

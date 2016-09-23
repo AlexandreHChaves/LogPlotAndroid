@@ -29,24 +29,25 @@ public class Ruler {
     private float width;
     private double position;
     private float pxPosition;
-    public Text label;
+    public Label label;
 
     public Ruler() {
         width = 1f;
         position = 0d;
         pxPosition = 0f;
         color = ChartColor.StandardColor.minorRuler;
-        label = new Text() {
-            @Override
-            public String getText() {
-                if(super.getText().isEmpty()) {
-                    return String.valueOf(position);
-                } else {
-                    return super.getText();
-                }
-            }
-        };
-        label.setColor(ChartColor.StandardColor.axisLabel);
+        label = new Label();
+//        label = new Label() {
+//            @Override
+//            public String getLabel() {
+//                if(super.getLabel().isEmpty()) {
+//                    return String.valueOf(position);
+//                } else {
+//                    return super.getLabel();
+//                }
+//            }
+//        };
+//        label.setColor(ChartColor.StandardColor.axisLabel);
     }
 
     public int getColor() {
@@ -84,6 +85,20 @@ public class Ruler {
      */
     public void setPosition(double position) {
         this.position = position;
+    }
+
+    /**
+     * @return Return a Label label from ruler
+     */
+    public Label getLabel() {
+        return label;
+    }
+
+    /**
+     * @param label set the label for ruler in Text form
+     */
+    public void setLabel(Label label) {
+        this.label = label;
     }
 
     /** @return get position for this ruler in pixels */

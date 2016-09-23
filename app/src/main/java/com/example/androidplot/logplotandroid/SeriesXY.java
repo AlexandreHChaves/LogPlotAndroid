@@ -18,7 +18,6 @@ package com.example.androidplot.logplotandroid;
 
 import android.util.Log;
 
-import java.awt.font.TextAttribute;
 import java.util.ArrayList;
 
 /**
@@ -39,15 +38,19 @@ public class SeriesXY implements Cloneable{
     private double[] xValues;
     private double[] yValues;
 
-    private boolean isToWritePointText = false;
+    private boolean isToWritePointLabel = false;
     private boolean isToWritePointCoordinate = false;
 
     private String name;
+    /** identification of the series in the label (legend) area */
+    private String label;
 
     /**
-     * This builds a new empty series. Afterwards you will need to input data
-     * with setData(x[], y[]); setPointsList(PointPlot[]); setxValues(x[]) and setyValues(y[]) with
-     * makeSeries() after; addPoint(PointPlot)
+     * This builds a new empty series. Afterwards you will need to input data with:<br>
+     * * setData(x[], y[]); <br>
+     * * setPointsList(PointPlot[]);<br>
+     * * setxValues(x[]) and setyValues(y[]) with makeSeries() after; <br>
+     * * addPoint(PointPlot)
      */
     public SeriesXY() {
         setLineColor(ChartColor.StandardColor.line);
@@ -70,10 +73,11 @@ public class SeriesXY implements Cloneable{
     private SeriesXY(SeriesXY series) {
         this.setLineType(series.getLineType());
         this.setToWritePointCoordinate(series.isToWritePointCoordinate());
-        this.setToWritePointText(series.isToWritePointText());
+        this.setToWritePointLabel(series.isToWritePointLabel());
         this.setLineColor(series.getLineColor());
         this.setLineWidth(series.getLineWidth());
         this.setName(series.getName());
+        this.setLabel(series.getLabel());
 
         for (PointPlot point : series.getPointsList()) {
             addPoint(point.clone());
@@ -109,6 +113,20 @@ public class SeriesXY implements Cloneable{
 
     public String getName() {
         return name;
+    }
+
+    /**
+     * @return  identification of the series in the label (legend) area
+     */
+    public String getLabel() {
+        return label;
+    }
+
+    /**
+     * @param label identification of the series in the label (legend) area
+     */
+    public void setLabel(String label) {
+        this.label = label;
     }
 
     public void setPointsList(PointPlot[] pointsArray) {
@@ -186,6 +204,9 @@ public class SeriesXY implements Cloneable{
         return pointsList.size();
     }
 
+    /**
+     * @return Maximum value from X axis
+     */
     public Double getXMaxValue(){
 
         Double xMaxValue = Double.NEGATIVE_INFINITY;
@@ -200,17 +221,30 @@ public class SeriesXY implements Cloneable{
         return xMaxValue;
     }
 
+    /**
+     *
+     * @return Minimum value from X axis
+     */
     public Double getXMinValue() {
+
         Double xMinValue = Double.POSITIVE_INFINITY;
 
         if (getPointsList().size() > 0) {
             for (PointPlot point : getPointsList()) {
-                if (point.getY() < xMinValue) {
+                if (point.getX() < xMinValue) {
                     xMinValue = point.getX();
                 }
             }
         }
         return xMinValue;
+    }
+
+    /**
+     *
+     * @return the value amplitude from minimum to maximum value in the X axis
+     */
+    public double getXRange() {
+        return getXMaxValue() - getXMinValue();
     }
 
     public Double getYMaxValue(){
@@ -219,24 +253,34 @@ public class SeriesXY implements Cloneable{
 
         if (getPointsList().size() > 1) {
             for (PointPlot point : getPointsList()) {
-                if (point.getX() > yMaxValue) {
-                    yMaxValue = point.getX();
+                if (point.getY() > yMaxValue) {
+                    yMaxValue = point.getY();
                 }
             }
         }
         return yMaxValue;
     }
 
+    /**
+     * @return the minimum value in the Y axis
+     */
     public Double getYMinValue() {
-        Double yMinValue = Double.NEGATIVE_INFINITY;
+        Double yMinValue = Double.POSITIVE_INFINITY;
         if (getPointsList().size() > 1) {
             for (PointPlot point : getPointsList()) {
-                if (point.getX() > yMinValue) {
-                    yMinValue = point.getX();
+                if (point.getY() < yMinValue) {
+                    yMinValue = point.getY();
                 }
             }
         }
         return yMinValue;
+    }
+
+    /**
+     * @return the amplitude value from minimum to maximum values in the Y axis
+     */
+    public double getYRange() {
+        return getYMaxValue() - getYMinValue();
     }
 
     /***
@@ -244,6 +288,9 @@ public class SeriesXY implements Cloneable{
      * @return a SeriesXY object
      */
     public SeriesXY makeSeries(){
+
+        final String METHOD_NAME = "........ makeSeries() ......";
+
         if (xValues != null && yValues != null) {
 
             int xLength = xValues.length;
@@ -254,8 +301,17 @@ public class SeriesXY implements Cloneable{
                     for (int i = 0; i < xLength; i++) {
                         addPoint(new PointPlot(xValues[i], yValues[i]));
                     }
+                } else {
+                    printLog(METHOD_NAME);
+                    Log.e(TAG, "arrays with different dimensions");
                 }
+            } else {
+                printLog(METHOD_NAME);
+                Log.e(TAG, "at least one of the arrays is empty");
             }
+        } else {
+            printLog(METHOD_NAME);
+            Log.e(TAG, "at least one of the arrays is NULL");
         }
 
         return this;
@@ -295,19 +351,35 @@ public class SeriesXY implements Cloneable{
         this.yValues = yValues;
     }
 
-    public boolean isToWritePointText() {
-        return isToWritePointText;
+    /**
+     * @return true if it is ordered to write the label of that point
+     */
+    public boolean isToWritePointLabel() {
+        return isToWritePointLabel;
     }
 
-    public void setToWritePointText(boolean toWritePointText) {
-        isToWritePointText = toWritePointText;
+    /**
+     * @param toWritePointLabel true if you want to plot (write) the point label
+     */
+    public void setToWritePointLabel(boolean toWritePointLabel) {
+        isToWritePointLabel = toWritePointLabel;
     }
 
+    /**
+     * @return true if it is to plot (write) the point coordinate
+     */
     public boolean isToWritePointCoordinate() {
         return isToWritePointCoordinate;
     }
 
+    /**
+     * @param toWritePointCoordinate true if you want to plot (write) the point coordinate
+     */
     public void setToWritePointCoordinate(boolean toWritePointCoordinate) {
         isToWritePointCoordinate = toWritePointCoordinate;
+    }
+
+    private  void printLog(String message){
+        Log.i(TAG, message);
     }
 }

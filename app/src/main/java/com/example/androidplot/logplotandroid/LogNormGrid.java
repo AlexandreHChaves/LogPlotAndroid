@@ -30,6 +30,7 @@ import static com.example.androidplot.logplotandroid.Utils.spToPx;
  * Created by achaves on 17-05-2016.
  *
  */
+@Deprecated
 public class LogNormGrid extends Grid {
 
     private final String TAG = "LogNormGrid";

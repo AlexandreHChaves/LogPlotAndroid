@@ -35,34 +35,41 @@ public class AxisLinear extends Axis {
     @Override
     public float scale(double value) {
 
-        if (Double.isInfinite(getMaxAxisRange())) {
-            Log.e(TAG, "axis range not defined: infinity");
-            return 0f;
+        Float answer = super.scale(value);
+
+        if (answer == -1) {
+            return answer;
         }
 
-        if (Double.isInfinite(getMaxAxisRange())) {
-            Log.e(TAG, "axis range not defined: infinity");
-            return 0f;
-        }
-
-        if (getMinAxisRange() > getMaxAxisRange()) {
-            Log.e(TAG, "minimum > maximum; limits for the axis range ill defined; review axis limits");
-            return 0f;
-        }
-
-        if (getPxLength() == 0f) {
-            Log.e(TAG, "invalid value for axis length: 0px");
-            return 0f;
-        }
+//        if (Double.isInfinite(getMaxAxisRange())) {
+//            Log.e(TAG, "axis range not defined: infinity");
+//            return 0f;
+//        }
+//
+//        if (Double.isInfinite(getMaxAxisRange())) {
+//            Log.e(TAG, "axis range not defined: infinity");
+//            return 0f;
+//        }
+//
+//        if (getMinAxisRange() > getMaxAxisRange()) {
+//            Log.e(TAG, "minimum > maximum; limits for the axis range ill defined; review axis limits");
+//            return 0f;
+//        }
+//
+//        if (getPxLength() == 0f) {
+//            Log.e(TAG, "invalid value for axis length: 0px");
+//            return 0f;
+//        }
 //
 //        Log.d(TAG, "value: " + value);
-//        Log.d(TAG, "axisRange: " + axisRange);
-//        Log.d(TAG, "pxLength: " + pxLength);
+//        Log.d(TAG, "axisRange: " + getAxisRange());
+//        Log.d(TAG, "pxLength: " + getPxLength());
 //
-//        Log.d(TAG, "(value * pxLength / axisRange) :" + (value * pxLength / axisRange));
+//        Log.d(TAG, "value in pixels:" + ((value - getMinAxisRange())* getPxLength() / getAxisRange()));
+//        Log.d(TAG, "minimum axis range: " + getMinAxisRange());
 
         // px = m*value + b; b = 0
-        return (float) (value * getPxLength() / (getAxisRange()));
+        return (float) ((value - getMinAxisRange()) * getPxLength() / getAxisRange());
     }
 
     @Override
@@ -78,19 +85,26 @@ public class AxisLinear extends Axis {
 
         if (getIsLinear()){ // this only works if the axis scale is linear
             if (getStep() > 0d) {
-                float pxStep = scale(getStep());
+                float pxStep = scale(getMinAxisRange() + getStep());
 //                Log.i(TAG, "pxStep: " + pxStep);
                 if (pxStep < getPxLength()) {
 
                     double firstStep = getMinAxisRange() + (getStep() - getMinAxisRange()%getStep());
+                    Log.d(TAG, "first step ruler value position: " + firstStep);
+
                     double rulerPosition = firstStep;
                     float rulerPxPosition = scale(firstStep);
 
                     int i = 0; // fuse
-                    while (rulerPxPosition <= getPxLength()) {
+                    while (true) {
+
+                        if (rulerPxPosition > getPxLength() || rulerPxPosition < 0) {
+                            Log.i(TAG, "fuse iteration: " + i);
+                            break;
+                        }
 
                         if (i == MAX_ITERACTIONS) {
-                            getGridRulers().getRulers().clear();
+                            gridRulers.getRulers().clear();
                             Log.e(TAG,
                                     "cycle to assign rulers blew up; \n" +
                                             "maybe step to short for the axis;\n" +
@@ -105,10 +119,12 @@ public class AxisLinear extends Axis {
 
 //                        ruler.setPxPosition(rulerPxPosition);
                         ruler.setPxPosition(rulerPxPosition);
-                        ruler.setPosition(rulerPosition);
-                        getGridRulers().addRuler(ruler);
+                        ruler.label.setText(String.valueOf(rulerPosition));
+//                        Log.i(TAG, "ruler position: " + rulerPosition);
+                        gridRulers.addRuler(ruler);
 //                        rulerPxPosition += firstPxStep;
-                        rulerPosition += firstStep;
+//                        rulerPosition += firstStep;
+                        rulerPosition += getStep();
                         rulerPxPosition = scale(rulerPosition);
 
                         i++;
@@ -120,8 +136,8 @@ public class AxisLinear extends Axis {
                 Log.w(TAG, "step to assign rulers not defined or wrong");
             }
 
-            if (getUserRulers().size() > 0) {
-                for (Ruler ruler : getUserRulers()) {
+            if (userRulers.getRulers().size() > 0) {
+                for (Ruler ruler : userRulers.getRulers()) {
                     ruler.setPxPosition(scale(ruler.getPosition()));
                 }
             }
@@ -129,6 +145,8 @@ public class AxisLinear extends Axis {
             if (this.hasGridRulers()) {
                 super.apply();
             }
+        } else {
+            Log.w(TAG, "axis NOT defined as LINEAR");
         }
 //        Log.d(TAG, "this axis has rulers: " + hasGridRulers());
 //        Log.d(TAG, "# rulers: " + getGridRulers().size());

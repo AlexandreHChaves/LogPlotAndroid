@@ -19,6 +19,7 @@ package com.example.androidplot.logplotandroid;
 import android.util.Log;
 
 /** Created by achaves on 10-05-2016. */
+@Deprecated
 public class GranulometryPlot extends Plot{
 
     private final String TAG = "GranulometryPlot";
@@ -30,7 +31,7 @@ public class GranulometryPlot extends Plot{
     public void gridDefinition() {
         Log.i(TAG, ".... gridDefinition.....");
 
-        getGrid().getXAxis().setMaxAxisRange(getGrid().getXAxis().getMaxAxisRange()); //
+//        getGrid().getXAxis().setMaxAxisRange(getGrid().getXAxis().getMaxAxisRange()); //
 
         getGrid().apply(); // defines axis, rulers and labels
 
@@ -64,7 +65,7 @@ public class GranulometryPlot extends Plot{
                     getGrid().writeSeriesPointCoordinate(series);
                 }
 
-                if (series.isToWritePointText()) { // the point label
+                if (series.isToWritePointLabel()) { // the point label
                     getGrid().writeSeriesPointText(series);
                 }
             }

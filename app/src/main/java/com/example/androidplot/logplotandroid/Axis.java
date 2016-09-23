@@ -42,9 +42,9 @@ public abstract class Axis extends Ruler implements Scalable, Applyable{
     private boolean isLinear = true;
 
     /** array of rulers to be applied in the grid */
-    private Rulers gridRulers = new Rulers();
+    public Rulers gridRulers = new Rulers();
     /** array of ruler defined by the user */
-    private Rulers userRulers = new Rulers();
+    protected Rulers userRulers = new Rulers();
 
     public Axis(){
         Log.i(TAG, ".............. creating new Axis() ..............");
@@ -92,26 +92,34 @@ public abstract class Axis extends Ruler implements Scalable, Applyable{
         this.minAxisRange = minAxisRange;
     }
 
+    /**
+     * replace by axis.gridRulers
+     */
+    @Deprecated
     public Rulers getGridRulers() {
         return gridRulers;
     }
 
+    @Deprecated
     public void setGridRulers(ArrayList<Ruler> gridRulers) {
         if (gridRulers != null) {
             this.gridRulers.setRulers(gridRulers);
         }
     }
 
+    @Deprecated
     public void addGridRuler(Ruler ruler) {
         if (ruler != null) {
             this.gridRulers.addRuler(ruler);
         }
     }
 
+    @Deprecated
     public Ruler getGridRuler(int index) {
         return this.gridRulers.getRuler(index);
     }
 
+    @Deprecated
     public ArrayList<Ruler> getUserRulers() {
         return userRulers.getRulers();
     }
@@ -120,6 +128,7 @@ public abstract class Axis extends Ruler implements Scalable, Applyable{
         this.userRulers.setRulers(userRulers);
     }
 
+    @Deprecated
     public void addUserRuler(Ruler ruler) {
         userRulers.addRuler(ruler);
     }
@@ -175,30 +184,48 @@ public abstract class Axis extends Ruler implements Scalable, Applyable{
 
         if (Double.isInfinite(getMaxAxisRange())) {
             Log.e(TAG, "maximum axis range not defined: infinity");
-            return Float.NEGATIVE_INFINITY;
+            return -1;
         }
 
-        if (Double.isInfinite(getMinAxisRange())) {
-            Log.e(TAG, "minimum axis range not defined: infinity");
-            return Float.NEGATIVE_INFINITY;
+        if (getMinAxisRange() > getMaxAxisRange()) {
+            Log.e(TAG, "minimum > maximum; limits for the axis range ill defined; review axis limits");
+            return -1;
         }
 
         if (getPxLength() == 0f) {
             Log.e(TAG, "invalid value for axis length: 0px");
-            return Float.NEGATIVE_INFINITY;
+            return -1;
         }
+
+        if (Double.isInfinite(getMinAxisRange())) {
+            Log.e(TAG, "minimum axis range not defined: infinity");
+            return -1;
+        }
+
+        if (value < getMinAxisRange()) {
+            Log.e(TAG, "value out of range: " + value );
+            Log.e(TAG, "minimum admissible value: " + getMinAxisRange());
+            return -1;
+        }
+
+        if (value > getMaxAxisRange()) {
+            Log.e(TAG, "value out of range: " + value );
+            Log.e(TAG, "maximum admissible value: " + getMaxAxisRange());
+            return -1;
+        }
+
         return (float) value;
     }
 
     @Override
     public void apply() {
         Log.d(TAG, "........ apply() .............");
-        getGridRulers().setAllRulersColor();
-        getGridRulers().setAllRulersWidth();
-        getGridRulers().setAllRulersLabelSize();
-        getGridRulers().setAllRulersLabelColor();
-        getGridRulers().setAllRulersHOffsetLabel();
-        getGridRulers().setAllRulersVOffsetLabel();
-        getGridRulers().setAllRulersLabelAngle();
+        gridRulers.setAllRulersColor();
+        gridRulers.setAllRulersWidth();
+        gridRulers.setAllRulersLabelSize();
+        gridRulers.setAllRulersLabelColor();
+        gridRulers.setAllRulersHOffsetLabel();
+        gridRulers.setAllRulersVOffsetLabel();
+        gridRulers.setAllRulersLabelAngle();
     }
 }

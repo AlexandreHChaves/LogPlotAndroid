@@ -25,7 +25,8 @@ public interface Scalable {
      * <code>value</code> should never surpass the <code>axisRange</code> value
      *
      * @param value value representing the data
-     * @return transformed coordinate in the axis representing <code>value</code> in pixels.
+     * @return transformed coordinate in the axis representing <code>value</code> in pixels.<br>
+     *     -1 if input value is out of range
      */
     float scale(double value) ;
 }
