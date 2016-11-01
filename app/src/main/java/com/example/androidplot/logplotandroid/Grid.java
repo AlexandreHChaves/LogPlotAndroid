@@ -160,7 +160,7 @@ public class Grid implements Applyable{
     }
 
     /**
-     * @param leftBorder position of the left border of the grid in pixel units
+     * @param leftBorder position of the left border of the grid in dp units
      */
     public void setLeftBorder(float leftBorder) {
         this.leftBorder = leftBorder;
@@ -171,18 +171,21 @@ public class Grid implements Applyable{
     }
 
     /**
-     * @param rightBorder position of the right border of the grid in pixel
+     * @param rightBorder position of the right border of the grid in dp units
      */
     public void setRightBorder(float rightBorder) {
         this.rightBorder = rightBorder;
     }
 
+    /**
+     * @return right margin of the grid in dp units
+     */
     public float getRightBorder() {
         return rightBorder;
     }
 
     /**
-     * @param topBorder position of the top border of the grid in pixel
+     * @param topBorder position of the top border of the grid in dp
      */
     public void setTopBorder(float topBorder) {
         this.topBorder = topBorder;
@@ -193,7 +196,7 @@ public class Grid implements Applyable{
     }
 
     /**
-     * @param bottomBorder position of the bottom border of the grid in pixel
+     * @param bottomBorder position of the bottom border of the grid in dp units
      */
     public void setBottomBorder(float bottomBorder) {
         this.bottomBorder = bottomBorder;
@@ -203,18 +206,18 @@ public class Grid implements Applyable{
         return bottomBorder;
     }
 
-    /** @return  The left label border of the graphic in pixel units */
+    /** @return  The left label border of the graphic in dp units */
     public float getLeftTextBorder() {
         return leftTextBorder;
     }
 
-    /** @param leftTextBorder  The left text border of the graphic in pixel units */
+    /** @param leftTextBorder  The left text border of the graphic in dp units */
     public void setLeftTextBorder(float leftTextBorder) {
         this.leftTextBorder = leftTextBorder;
     }
 
     /**
-     * @return The top label border of the graphic in pixel units
+     * @return The top label border of the graphic in dp units
      */
     public float getTopTextBorder() {
         return topTextBorder;
@@ -236,7 +239,7 @@ public class Grid implements Applyable{
         return bottomTextBorder;
     }
 
-    /** set the bottom label margin border */
+    /** set the bottom label margin border in dp units*/
     public void setBottomTextBorder(float bottomTextBorder) {
         this.bottomTextBorder = bottomTextBorder;
     }
@@ -467,7 +470,7 @@ public class Grid implements Applyable{
 
         float rtn;
 //        float leftMargin = getLeftBorderPx() + getLeftTextBorderPx() + getYAxis().getWidth();
-        float leftMargin = getLeftBorder() + getLeftTextBorder() + getYAxis().getWidth()/2.0f;
+        float leftMargin = dpToPx(getLeftBorder()) + dpToPx(getLeftTextBorder()) + getYAxis().getWidth()/2.0f;
 
         if (xCoord > 0f) {
             if (leftMargin + xCoord > canvas.getWidth()) {
@@ -494,7 +497,7 @@ public class Grid implements Applyable{
 
         float rtn;
 
-        float bottomMargin = getBottomBorder() + getBottomTextBorder();
+        float bottomMargin = dpToPx(getBottomBorder()) + dpToPx(getBottomTextBorder());
         float xAxisWidth =  getXAxis().getWidth()/2;
 //        float xAxisWidth =  0f;
 
@@ -526,53 +529,53 @@ public class Grid implements Applyable{
             paint.setColor(getBackGroundColor());
 
             canvas.drawRect(
-                    getLeftBorder(),
-                    getTopBorder(),
-                    canvas.getWidth() - getRightBorder(),
-                    canvas.getHeight() - getBottomBorder(),
+                    dpToPx(getLeftBorder()),
+                    dpToPx(getTopBorder()),
+                    canvas.getWidth() - dpToPx(getRightBorder()),
+                    canvas.getHeight() - dpToPx(getBottomBorder()),
                     paint
             );
 
             if (xAxis.label.hasText()) {
                 paint.setTextSize(spToPx(xAxis.label.getSize()));
                 if (xAxis.label.getVOffset() < ZERO_F) {
-                    setBottomTextBorder(- dpToPx(xAxis.label.getVOffset()) + paint.getTextSize() + dpToPx(xAxis.getWidth()));
+                    setBottomTextBorder(getBottomTextBorder() - xAxis.label.getVOffset() + paint.getTextSize() + xAxis.getWidth());
                 } else {
-                    setBottomTextBorder(paint.getTextSize() + dpToPx(xAxis.getWidth()));
+                    setBottomTextBorder(getBottomTextBorder() + paint.getTextSize() + xAxis.getWidth());
                 }
             }
 
             if (xAxis.gridRulers.label.getVOffset() < ZERO_F) {
-                setBottomTextBorder(getBottomTextBorder() - dpToPx(xAxis.gridRulers.label.getVOffset()));
+                setBottomTextBorder(getBottomTextBorder() - xAxis.gridRulers.label.getVOffset());
             }
 
             if (yAxis.label.hasText()) {
                 paint.setTextSize(spToPx(yAxis.label.getSize()));
 
                 if (yAxis.label.getHOffset() < ZERO_F) {
-                    setLeftTextBorder(dpToPx(-yAxis.label.getHOffset()) + paint.getTextSize() + dpToPx(yAxis.getWidth()));
+                    setLeftTextBorder(getLeftTextBorder() - yAxis.label.getHOffset() + paint.getTextSize() + yAxis.getWidth());
                 } else {
-                    setLeftTextBorder(paint.getTextSize() +  dpToPx(yAxis.getWidth()));
+                    setLeftTextBorder(getLeftTextBorder() + paint.getTextSize() +  yAxis.getWidth());
                 }
             }
 
             if (yAxis.gridRulers.label.getHOffset() < ZERO_F) {
-                setLeftTextBorder(getLeftTextBorder() - dpToPx(yAxis.gridRulers.label.getHOffset()));
+                setLeftTextBorder(getLeftTextBorder() - yAxis.gridRulers.label.getHOffset());
             }
 
             xAxis.setPxLength(
                     canvas.getWidth() -
-                            getLeftBorder() -
-                            getLeftTextBorder() -
-                            getRightBorder() -
-                            getRightTextBorder()
+                            dpToPx(getLeftBorder()) -
+                            dpToPx(getLeftTextBorder()) -
+                            dpToPx(getRightBorder()) -
+                            dpToPx(getRightTextBorder())
             );
             yAxis.setPxLength(
                     canvas.getHeight() -
-                            getTopBorder() -
-                            getTopTextBorder() -
-                            getBottomBorder() -
-                            getBottomTextBorder()
+                            dpToPx(getTopBorder()) -
+                            dpToPx(getTopTextBorder()) -
+                            dpToPx(getBottomBorder()) -
+                            dpToPx(getBottomTextBorder())
             );
 
             xAxis.apply(); // evaluates rulers position in the axis in pixel units
@@ -584,11 +587,11 @@ public class Grid implements Applyable{
                 for (Ruler ruler : yAxis.gridRulers.getRulers()) {
                     paint.setColor(ruler.getColor());
                     paint.setStrokeWidth(ruler.getWidth());
-                    canvas.drawLine(
-                            xPx(ZERO_F),
-                            yPx(ruler.getPxPosition()),
-                            xPx(xAxis.getPxLength()),
-                            yPx(ruler.getPxPosition()),
+
+                    drawHorizontalRuler(
+                            canvas,
+                            ruler,
+                            xAxis,
                             paint
                     );
 
@@ -599,7 +602,7 @@ public class Grid implements Applyable{
                         paint.setTextSize(spToPx(ruler.label.getSize()));
 
                         canvas.drawText(
-                                roundStringValue(ruler.label.getText()),
+                                ruler.label.getText(),
                                 xPx(dpToPx(ruler.label.getHOffset())),
                                 yPx(ruler.getPxPosition() + dpToPx(ruler.label.getVOffset())),
                                 paint
@@ -617,13 +620,14 @@ public class Grid implements Applyable{
                 for (Ruler ruler : xAxis.gridRulers.getRulers()) {
                     paint.setColor(ruler.getColor());
                     paint.setStrokeWidth(dpToPx(ruler.getWidth()));
-                    canvas.drawLine(
-                            xPx(ruler.getPxPosition()),
-                            yPx(ZERO_F),
-                            xPx(ruler.getPxPosition()),
-                            yPx(yAxis.getPxLength()),
+
+                    drawVerticalRuler(
+                            canvas,
+                            ruler,
+                            yAxis,
                             paint
                     );
+
                     Log.i(TAG, "label value: " + ruler.label.getText());
                     Log.i(TAG, "i: " + i);
                     if (i%(xAxis.gridRulers.getLabelSpacing()) == 0) { // print label for each nth ruler
@@ -652,13 +656,20 @@ public class Grid implements Applyable{
                 for (Ruler ruler : yAxis.userRulers.getRulers()) {
                     paint.setColor(ruler.getColor());
                     paint.setStrokeWidth(ruler.getWidth());
-                    canvas.drawLine(xPx(ZERO_F), yPx(ruler.getPxPosition()), xPx(xAxis.getPxLength()), yPx(ruler.getPxPosition()), paint);
+
+                    drawHorizontalRuler(
+                            canvas,
+                            ruler,
+                            xAxis,
+                            paint
+                    );
+
                     paint.setColor(ruler.label.getColor());
                     paint.setTextSize(spToPx(ruler.label.getSize()));
                     canvas.drawText(
                             ruler.label.getText(),
                             xPx(dpToPx(ruler.label.getHOffset())),
-                            yPx(ruler.getPxPosition() + ruler.label.getVOffset()),
+                            yPx(ruler.getPxPosition() + dpToPx(ruler.label.getVOffset())),
                             paint
                     );
                 }
@@ -672,19 +683,26 @@ public class Grid implements Applyable{
                 for (Ruler ruler : xAxis.userRulers.getRulers()) {
                     paint.setColor(ruler.getColor());
                     paint.setStrokeWidth(dpToPx(ruler.getWidth()));
-                    canvas.drawLine(
-                            xPx(ruler.getPxPosition()),
-                            yPx(ZERO_F),
-                            xPx(ruler.getPxPosition()) ,
-                            yPx(yAxis.getPxLength()),
+
+                    drawVerticalRuler(
+                            canvas,
+                            ruler,
+                            yAxis,
                             paint
                     );
+//                    canvas.drawLine(
+//                            xPx(ruler.getPxPosition()),
+//                            yPx(ZERO_F),
+//                            xPx(ruler.getPxPosition()) ,
+//                            yPx(yAxis.getPxLength()),
+//                            paint
+//                    );
                     paint.setColor(ruler.label.getColor());
                     paint.setTextSize(spToPx(ruler.label.getSize()));
                     canvas.drawText(
                             ruler.label.getText(),
-                            xPx(ruler.getPxPosition() + ruler.label.getHOffset()),
-                            yPx(ruler.label.getVOffset()),
+                            xPx(ruler.getPxPosition() + dpToPx(ruler.label.getHOffset())),
+                            yPx(dpToPx(ruler.label.getVOffset())),
                             paint
                     );
                 }
@@ -709,7 +727,7 @@ public class Grid implements Applyable{
                 paint.setTextSize(spToPx(xAxis.label.getSize()));
                 paint.setColor(xAxis.label.getColor());
 
-                float yOffset = getBottomTextBorder() - 0.4f*paint.getTextSize(); // 40% of the text size to stick to the bottom edge
+                float yOffset = dpToPx(getBottomTextBorder()) - 0.4f*paint.getTextSize(); // 40% of the text size to stick to the bottom edge
 
                 Path path = new Path();
                 path.moveTo(xPx(ZERO_F), yPx(ZERO_F));
@@ -736,7 +754,7 @@ public class Grid implements Applyable{
                 paint.setTextSize(spToPx(yAxis.label.getSize()));
                 paint.setColor(yAxis.label.getColor());
 
-                float xOffset = - getLeftTextBorder() + paint.getTextSize()*0.9f; // 90% of the text size to stick to the left border edge
+                float xOffset = - dpToPx(getLeftTextBorder()) + paint.getTextSize()*0.9f; // 90% of the text size to stick to the left border edge
 
                 Path path = new Path();
                 path.moveTo(xPx(ZERO_F), yPx(ZERO_F));
@@ -749,15 +767,135 @@ public class Grid implements Applyable{
         }
     }
 
+    private void drawVerticalRuler(
+            Canvas canvas,
+            Ruler ruler,
+            Axis axis,
+            Paint paint
+    ) {
+        float x1;
+        float y1;
+        float x2;
+        float y2;
+        float pxDash;
+        float pxBlank;
+
+        paint.setColor(ruler.getColor());
+        paint.setStrokeWidth(ruler.getWidth());
+
+        x1 = ruler.getPxPosition();
+        x2 = ruler.getPxPosition();
+        pxDash = dpToPx(ruler.getDash());
+        pxBlank = dpToPx(ruler.getBlank());
+
+        if (pxDash == ZERO_F) {
+            canvas.drawLine(
+                    xPx(ruler.getPxPosition()),
+                    yPx(ZERO_F),
+                    xPx(ruler.getPxPosition()),
+                    yPx(axis.getPxLength()),
+                    paint
+            );
+            return;
+        }
+
+        y1 = ZERO_F;
+        y2 = pxDash;
+
+        while (y1 <= axis.getPxLength()) {
+            if (y2 > axis.getPxLength()) {
+                canvas.drawLine(
+                        xPx(x1),
+                        yPx(y1),
+                        xPx(x2),
+                        yPx(axis.getPxLength()),
+                        paint
+                );
+                return;
+            }
+
+            canvas.drawLine(
+                    xPx(x1),
+                    yPx(y1),
+                    xPx(x2),
+                    yPx(y2),
+                    paint
+            );
+
+            y1 = y2 + pxBlank;
+            y2 = y1 + pxDash;
+
+        }
+    }
+
     /**
-     * @param value string value to round (ex: 0.30000003)
-     * @return string value rounded (ex: 0.3)
+     * This draw a horizontal ruler across the plot
+     * @param canvas
+     * @param ruler
+     * @param axis
+     * @param paint
      */
-    private String roundStringValue(String value) {
-        Double dValue = Double.valueOf(value) * 10d;
-        long lValue = Math.round(dValue);
-        dValue = lValue/10d;
-        return String.valueOf(dValue);
+    private void drawHorizontalRuler(
+            Canvas canvas,
+            Ruler ruler,
+            Axis axis,
+            Paint paint
+    ) {
+
+        float x1;
+        float y1;
+        float x2;
+        float y2;
+        float pxDash;
+        float pxBlank;
+
+
+        paint.setColor(ruler.getColor());
+        paint.setStrokeWidth(ruler.getWidth());
+
+        y1 = ruler.getPxPosition();
+        y2 = ruler.getPxPosition();
+        pxDash = dpToPx(ruler.getDash());
+        pxBlank = dpToPx(ruler.getBlank());
+
+        if (pxDash == ZERO_F) {
+            canvas.drawLine(
+                    xPx(ZERO_F),
+                    yPx(y1),
+                    xPx(axis.getPxLength()),
+                    yPx(y2),
+                    paint
+            );
+            return;
+        }
+
+        x1 = ZERO_F;
+        x2 = pxDash;
+
+        while (x1 <= axis.getPxLength()) {
+
+            if (x2 > axis.getPxLength()) {
+                canvas.drawLine(
+                        xPx(x1),
+                        yPx(y1),
+                        xPx(axis.getPxLength()),
+                        yPx(y2),
+                        paint
+                );
+                return;
+            }
+
+            canvas.drawLine(
+                    xPx(x1),
+                    yPx(y1),
+                    xPx(x2),
+                    yPx(y2),
+                    paint
+            );
+
+            x1 = x2 + pxBlank;
+            x2 = x1 + pxDash;
+        }
     }
 
     private void printLog(String message) {

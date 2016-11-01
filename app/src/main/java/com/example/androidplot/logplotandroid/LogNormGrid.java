@@ -67,8 +67,8 @@ public class LogNormGrid extends Grid {
                 }
             }
 
-            if (xAxis.getGridRulers().label.getVOffset() < ZERO_F) {
-                setBottomTextBorder(getBottomTextBorder() - dpToPx(xAxis.getGridRulers().label.getVOffset()));
+            if (xAxis.gridRulers.label.getVOffset() < ZERO_F) {
+                setBottomTextBorder(getBottomTextBorder() - dpToPx(xAxis.gridRulers.label.getVOffset()));
             }
 
             if (yAxis.label.hasText()) {
@@ -81,8 +81,8 @@ public class LogNormGrid extends Grid {
                 }
             }
 
-            if (yAxis.getGridRulers().label.getHOffset() < ZERO_F) {
-                setLeftTextBorder(getLeftTextBorder() - dpToPx(yAxis.getGridRulers().label.getHOffset()));
+            if (yAxis.gridRulers.label.getHOffset() < ZERO_F) {
+                setLeftTextBorder(getLeftTextBorder() - dpToPx(yAxis.gridRulers.label.getHOffset()));
             }
 
             xAxis.setPxLength(
@@ -105,7 +105,7 @@ public class LogNormGrid extends Grid {
 
             // drawing rulers of y axis, rulers parallel to x axis
             if (yAxis.hasGridRulers()) {
-                for (Ruler ruler : yAxis.getGridRulers().getRulers()) {
+                for (Ruler ruler : yAxis.gridRulers.getRulers()) {
                     paint.setColor(ruler.getColor());
                     paint.setStrokeWidth(ruler.getWidth());
                     canvas.drawLine(
@@ -132,7 +132,7 @@ public class LogNormGrid extends Grid {
             // drawing rulers of x axis, rulers parallel to y axis
             if (xAxis.hasGridRulers()) {
                 int i = 1;
-                for (Ruler ruler : xAxis.getGridRulers().getRulers()) {
+                for (Ruler ruler : xAxis.gridRulers.getRulers()) {
                     paint.setColor(ruler.getColor());
                     paint.setStrokeWidth(dpToPx(ruler.getWidth()));
                     canvas.drawLine(
@@ -161,7 +161,7 @@ public class LogNormGrid extends Grid {
 
             // drawing personal rulers on y axis
             if (yAxis.hasUserRulers()) {
-                for (Ruler ruler : yAxis.getUserRulers()) {
+                for (Ruler ruler : yAxis.userRulers.getRulers()) {
                     paint.setColor(ruler.getColor());
                     paint.setStrokeWidth(ruler.getWidth());
                     canvas.drawLine(xPx(ZERO_F), yPx(ruler.getPxPosition()), xPx(xAxis.getPxLength()), yPx(ruler.getPxPosition()), paint);
@@ -178,7 +178,7 @@ public class LogNormGrid extends Grid {
 
             // drawing personal rulers on x axis
             if (xAxis.hasUserRulers()) {
-                for (Ruler ruler : xAxis.getUserRulers()) {
+                for (Ruler ruler : xAxis.userRulers.getRulers()) {
                     paint.setColor(ruler.getColor());
                     paint.setStrokeWidth(dpToPx(ruler.getWidth()));
                     canvas.drawLine(

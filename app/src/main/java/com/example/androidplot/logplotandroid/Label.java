@@ -26,7 +26,7 @@ public class Label {
 
     private final String TAG = "Label";
 
-    private String text;
+    private String text = "";
     private int color = ChartColor.StandardColor.axisLabel;
     private float size = 10f;
     private float angle = 0f;
@@ -40,9 +40,9 @@ public class Label {
     }
 
     public String getText() {
-        if (text == null) {
-            return "";
-        }
+//        if (text == null) {
+//            return "";
+//        }
         return text;
     }
 
@@ -64,6 +64,9 @@ public class Label {
         this.color = color;
     }
 
+    /**
+     * @return text size in sp units
+     */
     public float getSize() {
         return size;
     }

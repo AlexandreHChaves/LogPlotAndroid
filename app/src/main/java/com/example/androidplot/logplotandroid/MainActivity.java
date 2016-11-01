@@ -127,44 +127,54 @@ public class MainActivity extends Activity {
         xpRuler.setPosition(0.35);
 
         Ruler yRuler = new Ruler();
-        yRuler.setPosition(650);
-        yRuler.label.setText("650");
+        yRuler.setPosition(0.5);
+        yRuler.label.setText("0.5");
+        yRuler.setBlank(10);
+        yRuler.setDash(7);
+        yRuler.setColor(ContextCompat.getColor(this, R.color.amber_900));
 
         // ################# AXIS ##################
         AxisLog10 xAxis = new AxisLog10();
-        double step;
 //        Axis xAxis = new AxisLinear();
 //        AxisLog10 xAxis = new AxisLog10();
-        xAxis.gridRulers.label.setVOffset(-15);
+//        xAxis.gridRulers.label.setVOffset(-15);
+        Log.d(TAG, "xAxis.gridRulers.label.getSize(): " + xAxis.gridRulers.label.getSize());
+        xAxis.gridRulers.label.setVOffset(-xAxis.gridRulers.label.getSize());
         xAxis.gridRulers.label.setHOffset(-6);
         xAxis.gridRulers.setLabelSpacing(9);
+        xAxis.gridRulers.setDash(7);
+        xAxis.gridRulers.setBlank(10);
         xAxis.label.setVOffset(-5);
 //        xAxis.getGridRulers().label.setSize(10);
 //        xAxis.label.setVOffset(-12);
 //        xAxis.setWidth(5);
-        xAxis.setFirstMajorStepUnit(0.01); // 1cm
+        xAxis.setFirstMajorRulerStep(0.01, 2); // 1cm
         xAxis.label.setSize(12); // text size sp
         xAxis.label.setText("X Axis");
 
-//        step = RulerStepFinder.find(series.getXRange());
-//        Log.i(TAG, "X axis step: " + step);
-//        xAxis.setStep(step);
+//        rulerStep = RulerStepFinder.findRulerStep(series.getXRange());
+//        Log.i(TAG, "X axis rulerStep: " + rulerStep);
+//        xAxis.setStep(rulerStep);
 //        xAxis.addUserRuler(xpRuler);
 
 
         Axis yAxis = new AxisLinear();
 //        Axis yAxis = new AxisLog10();
-        yAxis.label.setHOffset(-5);
+//        yAxis.label.setHOffset(-5);
         yAxis.label.setSize(12);
 //        yAxis.setStep(50d);
-        step = RulerStepFinder.find(series.getYRange());
-        Log.i(TAG, "Y axis step: " + step);
-        yAxis.setStep(step);
+//        rulerStep = Axis.findRulerStep(series.getYRange());
+//        rulerStep =
+//        Log.i(TAG, "Y axis rulerStep: " + rulerStep);
+//        yAxis.rulerStep.setValue(rulerStep);
+        yAxis.rulerStep = Axis.findRulerStep(series.getYRange());
         yAxis.setWidth(2);
         yAxis.label.setText("Y Axis");
-        yAxis.gridRulers.label.setVOffset(-4);
-        yAxis.gridRulers.label.setHOffset(-35);
-        yAxis.gridRulers.setLabelSpacing(2);
+        yAxis.gridRulers.label.setVOffset(-yAxis.gridRulers.label.getSize()/2 + yAxis.gridRulers.getWidth());
+        yAxis.gridRulers.label.setHOffset(-20);
+        yAxis.gridRulers.setLabelSpacing(3);
+        yAxis.gridRulers.setDash(7);
+        yAxis.gridRulers.setBlank(20);
 
 //        yAxis.setMinAxisRange(0d);
 //        yAxis.setMaxAxisRange(1d);

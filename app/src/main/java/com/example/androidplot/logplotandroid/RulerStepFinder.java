@@ -27,6 +27,7 @@ import java.util.List;
  * Created by achaves on 18-09-2016.
  *
  */
+@Deprecated
 public class RulerStepFinder {
 
     private static final String TAG = "RulerStepFinder";
@@ -76,7 +77,7 @@ public class RulerStepFinder {
         switch (stepType) {
             case BIGGER_1:
                 while (true) {
-                    // returning the biggest stepping number that is smaller than step
+                    // returning the biggest stepping number that is smaller than rulerStep
                     if (step > Collections.max(steppingList)) {
                         s = s*10d;
                         d = d*10d;

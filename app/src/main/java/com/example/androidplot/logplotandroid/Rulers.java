@@ -39,6 +39,18 @@ public class Rulers extends Ruler{
         setPxPosition(Float.NEGATIVE_INFINITY);
     }
 
+    public void setAllRulersDash() {
+        for (Ruler ruler : getRulers()) {
+            ruler.setDash(getDash());
+        }
+    }
+
+    public void setAllRulersBlank() {
+        for (Ruler ruler : getRulers()) {
+            ruler.setBlank(getBlank());
+        }
+    }
+
     public void setAllRulersColor() {
         if (getColor() != 0) {
             for (Ruler ruler : getRulers()) {

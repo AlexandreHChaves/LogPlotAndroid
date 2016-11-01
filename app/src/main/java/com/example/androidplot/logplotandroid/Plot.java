@@ -40,7 +40,7 @@ public class Plot extends AsyncTask<Object, Void, Void> {
         return seriesList;
     }
 
-    public void setSeriesList(ArrayList<SeriesXY> seriesList) {
+    public void addSeriesList(ArrayList<SeriesXY> seriesList) {
         this.seriesList = seriesList;
     }
 

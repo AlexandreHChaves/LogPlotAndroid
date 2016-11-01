@@ -19,6 +19,8 @@ package com.example.androidplot.logplotandroid;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by achaves on 10-05-2016.
@@ -287,7 +289,7 @@ public class SeriesXY implements Cloneable{
      * Internally this passes the x and y array values previously inserted into PointPlot ArrayList
      * @return a SeriesXY object
      */
-    public SeriesXY makeSeries(){
+    private SeriesXY makeSeries(){
 
         final String METHOD_NAME = "........ makeSeries() ......";
 
@@ -315,6 +317,49 @@ public class SeriesXY implements Cloneable{
         }
 
         return this;
+    }
+
+    /**
+     * We might want to limit the series to a section of it
+     * @param xMin the minimum x value this series is allowed to have
+     * @param xMax the maximum x value this series is allowed to have
+     * @param yMin the minimum y value this series is allowed to have
+     * @param yMax the maximum y value this series is allowed to have
+     */
+    public void limitTo(double xMin, double xMax, double yMin, double yMax) {
+
+        boolean isARemovingPoint = false;
+        boolean hasPointsToRemove = false;
+        Set<PointPlot> pointsToRemove = new HashSet<>();
+
+        for (int j = 0; j < getPointsList().size() - 1; j++) {
+
+            if (getPoint(j).getX() < xMin) {
+                isARemovingPoint = true;
+            }
+
+            if (getPoint(j).getX() > xMax) {
+                isARemovingPoint = true;
+            }
+
+            if (getPoint(j).getY() < yMin) {
+                isARemovingPoint = true;
+            }
+
+            if (getPoint(j).getY() > yMax) {
+                isARemovingPoint = true;
+            }
+
+            if (isARemovingPoint) {
+                pointsToRemove.add(getPointsList().get(j));
+                hasPointsToRemove = true;
+                isARemovingPoint = false;
+            }
+        }
+
+        if (hasPointsToRemove) {
+            getPointsList().removeAll(pointsToRemove);
+        }
     }
 
     /** You can only set color in points AFTER the series have been added

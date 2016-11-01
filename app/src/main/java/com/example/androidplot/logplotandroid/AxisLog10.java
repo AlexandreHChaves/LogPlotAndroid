@@ -26,23 +26,30 @@ public class AxisLog10 extends Axis{
 
     private final String TAG = "AxisLog10";
 
-    private double firstMajorStepUnit;
+    private RulerStep firstMajorRulerStep = new RulerStep();
 
     public AxisLog10() {
         Log.d(TAG, "creating AxisLog10");
         setLinear(false);
     }
 
-    public double getFirstMajorStepUnit() {
-        return firstMajorStepUnit;
+    public RulerStep getFirstMajorRulerStep() {
+        return firstMajorRulerStep;
     }
 
     /** @param firstMajorStepUnit the value you want for the first "bigger ruler" to be represented.
      * For instance, if you want to represent the response from an audio monitor, the value for the
      * first major ruler might be 20 (as 20Hz). Posterior minor rulers will be 40, 60, ... and
-     * anterior and first minor rulers will be 4, 6, ...*/
-    public void setFirstMajorStepUnit(double firstMajorStepUnit) {
-        this.firstMajorStepUnit = firstMajorStepUnit;
+     * anterior and first minor rulers will be 4, 6, ...<br>
+     *
+     *  @param precision power of ten of decimal places. ex: <br>
+     *                   0.1 -> precision: 10<br>
+     *                   0.03 -> precision: 100
+     *
+     * */
+    public void setFirstMajorRulerStep(double firstMajorStepUnit, int precision) {
+        this.firstMajorRulerStep.setValue(firstMajorStepUnit);
+        this.firstMajorRulerStep.setPrecision(precision);
         setMinAxisRange(firstMajorStepUnit/10);
     }
 
@@ -65,21 +72,26 @@ public class AxisLog10 extends Axis{
 
         if (getMinAxisRange() >= getMaxAxisRange()) {
             Log.e(TAG, "range axis limits badly defined; review minimum and maximum axis range");
-            return;
+            throw new IllegalArgumentException("minimum axis value is higher than maximum axis value");
         }
 
         if (!isLinear()) {
 
             final int MAX_INTERACTIONS = 1000;
 
-//            float majorStepPx = scale(firstMajorStepUnit);
-//            float rulerPxPosition = majorStepPx;
-            double bigStep = firstMajorStepUnit;
-            double littleStep = bigStep/10;
+            RulerStep bigRulerStep = new RulerStep();
+            RulerStep littleRulerStep = new RulerStep();
+
+            bigRulerStep.setValue(firstMajorRulerStep.getValue());
+            bigRulerStep.setPrecision(firstMajorRulerStep.getPrecision());
+
+            littleRulerStep.setValue(firstMajorRulerStep.getValue()/10d);
+            littleRulerStep.setPrecision(bigRulerStep.getPrecision() + 1);
+
             float rulerPxPosition = 0;
 
-            if (getAxisRange() <= littleStep) {
-                Log.e(TAG, "the step chosen for the AxisLog10 is to large");
+            if (getAxisRange() <= littleRulerStep.getValue()) {
+                Log.e(TAG, "the rulerStep chosen for the AxisLog10 is to large");
                 return;
             }
 
@@ -92,7 +104,7 @@ public class AxisLog10 extends Axis{
                 if (fuse++ == MAX_INTERACTIONS) { // cycle fuse
                     gridRulers.getRulers().clear();
                     Log.e(TAG, "cycle to assign rulers blew up; \n" +
-                                    "maybe step to short for the axis;\n" +
+                                    "maybe rulerStep to short for the axis;\n" +
                                     "rulers cleared out"
                     );
                     break;
@@ -105,18 +117,18 @@ public class AxisLog10 extends Axis{
                     ruler = new MajorRuler();
                     ruler.setPxPosition(rulerPxPosition);
 
-//                    ruler.label.setLabel(String.valueOf(littleStep * 10));
-//                    Label label = new Label(String.valueOf(littleStep * 10));
-//                    label.setColor(ChartColor.StandardColor.axisLabel);
-//                    ruler.label.setColor(ChartColor.StandardColor.axisLabel);
-//                    ruler.label.setText(String.valueOf(littleStep * 10));
-//                    ruler.setLabel(label);
-
                     k++;
-                    bigStep = firstMajorStepUnit * Math.pow(10, k);
-                    littleStep = bigStep / 10;
+                    bigRulerStep.setValue(firstMajorRulerStep.getValue() * Math.pow(10, k));
+                    bigRulerStep.setPrecision(bigRulerStep.getPrecision() + 1);
+                    littleRulerStep.setValue(bigRulerStep.getValue() / 10);
 
-                    if (littleStep > getMaxAxisRange()) {
+                    if (littleRulerStep.getPrecision() < 1) {
+                        littleRulerStep.setPrecision(0);
+                    } else {
+                        littleRulerStep.setPrecision(littleRulerStep.getPrecision() - 1);
+                    }
+
+                    if (littleRulerStep.getValue() > getMaxAxisRange()) {
                         Log.w(TAG, "ruler position stopped by outer of range value");
                         break;
                     }
@@ -126,10 +138,10 @@ public class AxisLog10 extends Axis{
                     ruler.setPxPosition(rulerPxPosition);
                 }
 
-                ruler.label.setText(String.valueOf(littleStep * j));
+                ruler.label.setText(littleRulerStep.getStringValue(littleRulerStep.getValue() * j));
                 gridRulers.addRuler(ruler);
 
-                rulerPxPosition = scale(littleStep * ++j);
+                rulerPxPosition = scale(littleRulerStep.getValue() * ++j);
             }
 
             if (hasUserRulers()) { // user defined rulers

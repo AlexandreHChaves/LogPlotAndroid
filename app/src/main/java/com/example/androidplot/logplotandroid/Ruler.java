@@ -29,12 +29,16 @@ public class Ruler {
     private float width;
     private double position;
     private float pxPosition;
+    private float dash;
+    private float blank;
     public Label label;
 
     public Ruler() {
         width = 1f;
         position = 0d;
         pxPosition = 0f;
+        dash = 0f;
+        blank = 0f;
         color = ChartColor.StandardColor.minorRuler;
         label = new Label();
 //        label = new Label() {
@@ -111,4 +115,44 @@ public class Ruler {
         this.pxPosition = pxPosition;
     }
 
+    /**
+     * @return length of the dash in dp units
+     */
+    public float getDash() {
+        return dash;
+    }
+
+    /**
+     * Definition of the length of dashes for this ruler like: <br>
+     *     (--&emsp;--&emsp;--&emsp;--) or (-&emsp;-&emsp;-&emsp;-&emsp;-)<br>
+     *         Zero is defined by default defining a continuous line along the plot.
+     *         Negative number are illegal.
+     * @param dash the dash length in dp units
+     */
+    public void setDash(float dash) {
+        if (dash < 0f) {
+            throw new IllegalArgumentException(TAG + ": dash length must be a positive number or zero");
+        }
+        this.dash = dash;
+    }
+
+    public float getBlank() {
+        return blank;
+    }
+
+    /**
+     * Defines the blank length between the dashes: <br>
+     *     (-&emsp;&emsp;&emsp;-&emsp;&emsp;&emsp;-&emsp;&emsp;&emsp;-) or (-&emsp;-&emsp;-&emsp;-&emsp;-) <br>
+     *         Zero is defined by default meaning no space at all between dashes<br>
+     *         If you want a continuous line do: <br>
+     *         <code>setDash(0)</code> <br>
+     *         and ignore <code>setBlank(blank)</code>
+     * @param blank the blank length in dp units between dashes
+     */
+    public void setBlank(float blank) {
+        if (blank < 0f) {
+            throw new IllegalArgumentException(TAG + ": blank length must be a positive number or zero");
+        }
+        this.blank = blank;
+    }
 }
