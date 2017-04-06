@@ -628,14 +628,14 @@ public class Grid implements Applyable{
                             paint
                     );
 
-                    Log.i(TAG, "label value: " + ruler.label.getText());
-                    Log.i(TAG, "i: " + i);
+//                    Log.i(TAG, "label value: " + ruler.label.getText());
+//                    Log.i(TAG, "i: " + i);
                     if (i%(xAxis.gridRulers.getLabelSpacing()) == 0) { // print label for each nth ruler
 //                    if (i%10 == 0) { // print label for each nth ruler
 //                        i = 1;
-                        Log.i(TAG, "i: " + i);
-                        Log.i(TAG, "i%xAxis.gridRulers.getLabelSpacing(): " + i%xAxis.gridRulers.getLabelSpacing());
-                        Log.i(TAG, "label value: " + ruler.label.getText());
+//                        Log.i(TAG, "i: " + i);
+//                        Log.i(TAG, "i%xAxis.gridRulers.getLabelSpacing(): " + i%xAxis.gridRulers.getLabelSpacing());
+//                        Log.i(TAG, "label value: " + ruler.label.getText());
                         paint.setColor(ruler.label.getColor());
                         paint.setTextSize(spToPx(ruler.label.getSize()));
                         canvas.drawText(
