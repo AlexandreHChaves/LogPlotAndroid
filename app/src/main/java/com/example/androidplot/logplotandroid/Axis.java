@@ -18,7 +18,6 @@ package com.example.androidplot.logplotandroid;
 
 import android.util.Log;
 
-import java.security.acl.LastOwnerException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -137,21 +136,6 @@ public abstract class Axis extends Ruler implements Scalable, Applyable{
         userRulers.addRuler(ruler);
     }
 
-    /**
-     * distance between rulers in data units (for linear axis)
-     */
-//    public Double getStep() {
-//        return rulerStep;
-//    }
-
-//    /**
-//     * @param rulerStep distance between rulers in data units (for linear axis)
-//     */
-//    public void setStep(Double rulerStep) {
-//        this.rulerStep = rulerStep;
-//    }
-
-
     public RulerStep getRulerStep() {
         return rulerStep;
     }
@@ -256,172 +240,124 @@ public abstract class Axis extends Ruler implements Scalable, Applyable{
 
     /**
      * @param range distance between minimum and maximum values to be represented in the axis
+     * @param minNumberRulers minimum number of rulers in the graphics
      * @return distance at which rulers will be placed
      */
-    public static RulerStep findRulerStep(final double range) {
+    public static Axis.RulerStep findRulerStep(final double range, final int minNumberRulers) {
 
-        RulerStep rulerStep = new RulerStep();
+        Axis.RulerStep rulerStep = new Axis.RulerStep();
 
         if (range <= 0d) {
             Log.e(TAG, "range value must be a positive number bigger than 0 (zero)");
-            new RulerStep(); // returning empty rulerStep
+            new Axis.RulerStep(); // returning empty rulerStep
         }
 
-        /** minimum number of rulers in the plot */
-        final int N_RULERS = 5;
-        final int MAX_CYCLES = 100;
-        final double n_step = range/N_RULERS;
+        if (minNumberRulers <= 0) {
+            Log.e(TAG, "the minimum number of rulers must be a positive number bigger than 0 (zero)");
+            new Axis.RulerStep(); // returning empty rulerStep
+        }
 
-        double s = 1d; // singler
-        double d = 2d; // doubler
-        double f = 5d; // fiver
+        final double stepValue = range/(double)minNumberRulers;
+
+        double singler = 1d; // singler
+        double doubler = 2d; // doubler
+        double threer = 3d;
+        double fourer = 4d;
+        double fiver = 5d; // fiver
+        double sixer = 6d;
+        double sevener = 7d;
+        double eighter = 8d;
+        double niner = 9d;
         StepType stepType;
 
-        List<Double> steppingList = new ArrayList<>();
-        steppingList.add(0, s);
-        steppingList.add(1, d);
-        steppingList.add(2, f);
-
-        if (n_step == s) {
-            rulerStep.setValue(s);
-            return rulerStep;
-        }
-
-        if (n_step == d) {
-            rulerStep.setValue(d);
-            return rulerStep;
-        }
-
-        if (n_step == f) {
-            rulerStep.setValue(f);
-            return rulerStep;
-        }
-
-        if (n_step > s) {
+        if (stepValue >= singler) {
             stepType = StepType.BIGGER_1;
         } else {
             stepType = StepType.MINOR_1;
         }
 
-        int fuse = 0;
+        List<Double> stepListCandidate = new ArrayList<>();
 
-        switch (stepType) {
-            case BIGGER_1:
-                while (true) {
-                    // returning the biggest stepping number that is smaller than rulerStep
-                    if (n_step > Collections.max(steppingList)) {
-                        s = s*10d;
-                        d = d*10d;
-                        f = f*10d;
-                        steppingList.add(s);
-                        steppingList.add(d);
-                        steppingList.add(f);
-                    } else {
+        List<List<Double>> stepsList = new ArrayList<>();
 
-                        if (n_step == steppingList.get(steppingList.size() - 1)) {
-                            rulerStep.setValue(steppingList.get(steppingList.size() - 1));
-                            return rulerStep;
-                        }
-                        if (n_step == steppingList.get(steppingList.size() - 2)) {
-                            rulerStep.setValue(steppingList.get(steppingList.size() - 2));
-                            return rulerStep;
-                        }
-                        if (n_step == steppingList.get(steppingList.size() - 3)) {
-                            rulerStep.setValue(steppingList.get(steppingList.size() - 3));
-                            return rulerStep;
-                        }
+        if (stepType == StepType.BIGGER_1) {
 
+            stepListCandidate.add(0, singler);
+            stepListCandidate.add(1, doubler);
+            stepListCandidate.add(2, threer);
+            stepListCandidate.add(3, fourer);
+            stepListCandidate.add(4, fiver);
+            stepListCandidate.add(5, sixer);
+            stepListCandidate.add(6, sevener);
+            stepListCandidate.add(7, eighter);
+            stepListCandidate.add(8, niner);
 
-                        if(n_step > steppingList.get(steppingList.size() - 1 - 2)){ // compare with singler
-                            if (n_step > steppingList.get(steppingList.size() - 1 - 1)) { // compare with doubler
-                                // return a doubler because is not bigger than maximum (the next fiver)
-                                rulerStep.setValue(steppingList.get(steppingList.size() - 1 - 1));
-                                return rulerStep;
-                            } else {
-                                rulerStep.setValue(steppingList.get(steppingList.size() - 1 - 2));
-                                return rulerStep; // return singler
-                            }
-                        } else {
-                            rulerStep.setValue(steppingList.get(steppingList.size() - 1 - 3));
-                            return rulerStep; // return a fiver
-                        }
-                    }
-                    fuse += 1;
+            stepsList.add(stepListCandidate);
 
-                    if (fuse == MAX_CYCLES) {
-                        Log.e(TAG, "number of cycles has been surpassed in BIGGER_1 cycle: returning ZERO");
-                        return new RulerStep(); // returning empty rulerStep
-                    }
+            while (stepValue > Collections.max(stepsList.get(stepsList.size()-1))) {
+                List<Double> steps = new ArrayList<>();
+
+                for (Double d : stepsList.get(stepsList.size()-1)) {
+                    steps.add(d * 10);
                 }
-
-            case MINOR_1:
-
-//                rulerStep.setPrecision(10);
-                rulerStep.setPrecision(1);
-
-                steppingList.clear();
-                s = s/10d;
-                d = d/10d;
-                f = f/10d;
-                steppingList.add(f);
-                steppingList.add(d);
-                steppingList.add(s);
-
-                while (true) {
-                    if (n_step < Collections.min(steppingList)) {
-//                        rulerStep.setPrecision(rulerStep.getPrecision() * 10);
-                        rulerStep.setPrecision(rulerStep.getPrecision() + 1);
-                        s = s/10d;
-                        d = d/10d;
-                        f = f/10d;
-                        steppingList.add(f);
-                        steppingList.add(d);
-                        steppingList.add(s);
-
-                    } else {
-
-                        if (n_step == steppingList.get(steppingList.size() - 1)) {
-                            rulerStep.setValue(steppingList.get(steppingList.size() - 1));
-                            return rulerStep;
-                        }
-                        if (n_step == steppingList.get(steppingList.size() - 2)) {
-                            rulerStep.setValue(steppingList.get(steppingList.size() - 2));
-                            return rulerStep;
-                        }
-                        if (n_step == steppingList.get(steppingList.size() - 3)) {
-                            rulerStep.setValue(steppingList.get(steppingList.size() - 3));
-                            return rulerStep;
-                        }
-
-                        if (n_step > steppingList.get(steppingList.size() - 1 - 1)) { // compare with doubler
-                            if (n_step > steppingList.get(steppingList.size() - 1 - 2)) { // compare with fiver
-                                rulerStep.setValue(steppingList.get(steppingList.size() - 1 - 2)); // return fiver
-                                return rulerStep;
-                            } else {
-                                rulerStep.setValue(steppingList.get(steppingList.size() - 1 - 1)); // return doubler
-                                return rulerStep;
-                            }
-                        } else {
-                            rulerStep.setValue(steppingList.get(steppingList.size() - 1)); // return singler
-                            return rulerStep;
-                        }
-                    }
-
-                    fuse += 1;
-
-                    if (fuse == MAX_CYCLES) {
-                        Log.e(TAG, "number of cycles has been surpassed in MINOR_1 cycle: returning ZERO");
-                        return new RulerStep();
-                    }
-                }
+                stepsList.add(steps);
+            }
         }
 
-        return new RulerStep();
+        if (stepType == StepType.MINOR_1) {
+            rulerStep.setPrecision(1);
+
+            singler = singler/10d;
+            doubler = doubler/10d;
+            threer = threer/10d;
+            fourer = fourer/10d;
+            fiver = fiver/10d;
+            sixer = sixer/10d;
+            sevener = sevener/10d;
+            eighter = eighter/10d;
+            niner = niner/10d;
+
+            stepListCandidate.add(0, singler);
+            stepListCandidate.add(1, doubler);
+            stepListCandidate.add(2, threer);
+            stepListCandidate.add(3, fourer);
+            stepListCandidate.add(4, fiver);
+            stepListCandidate.add(5, sixer);
+            stepListCandidate.add(6, sevener);
+            stepListCandidate.add(7, eighter);
+            stepListCandidate.add(8, niner);
+
+            stepsList.add(stepListCandidate);
+
+            while (stepValue < Collections.min(stepsList.get(stepsList.size() - 1))) {
+                List<Double> steps = new ArrayList<>();
+                rulerStep.setPrecision(rulerStep.getPrecision() + 1);
+                for (Double d : stepsList.get(stepsList.size()-1)) {
+                    steps.add(d / 10);
+                }
+                stepsList.add(steps);
+            }
+        }
+
+        int nLists = stepsList.size();
+
+        for (int j = nLists-1; j >= 0; j--) {
+            List<Double> lastStepList = stepsList.get(j);
+            for (int i = lastStepList.size() - 1; i >= 0; i--) {
+                if (lastStepList.get(i) <= stepValue) {
+                    rulerStep.setValue(lastStepList.get(i));
+                    return rulerStep;
+                }
+            }
+        }
+
+        return new Axis.RulerStep();
     }
 
     public static class RulerStep {
+        /** numeric value of the data */
         private double value = 0;
-        /** ex: 100 means that number to be represented has 2 decimal places like 0.02  */
+        /** ex: 2 means that number has to be represented with 2 decimal places like 0.02  */
         private int precision = 1;
 
         public double getValue() {
@@ -433,33 +369,51 @@ public abstract class Axis extends Ruler implements Scalable, Applyable{
         }
 
         public int getPrecision() {
-            if (precision < 1) {
-                return 1;
-            } else {
+            if (precision > 0) {
                 return (int) Math.log10(precision);
+            }
+            else {
+                return precision;
             }
         }
 
         /**
          * @param precision number of decimal places that a number to be represented has <br>
          *                  ex:<br>
-         *                  0.008 -> 3<br>
-         *                  3 -> 0<br>
-         *                  3.25 -> 2
+         *                  0.008 -> precision 3<br>
+         *                  3 -> precision 0<br>
+         *                  3.25 -> precision 2
          */
         public void setPrecision(int precision) {
+
             if (precision < 0) {
                 Log.e(TAG, "WARNING: negative value for precision is invalid; assuming value 0 'zero'");
-                this.precision = 1; // 10E0 = 1
+                this.precision = 0;
             }
-            this.precision = (int) Math.pow(10, precision);
+            else if (precision == 0) {
+                this.precision = 0;
+            }
+            else
+                this.precision = (int) Math.pow(10, precision);
         }
 
         public String getStringValue(double value) {
-            Double dValue = value * precision;
-            long lValue = Math.round(dValue);
-            dValue = lValue/(double)precision;
-            return String.valueOf(dValue);
+            if (precision != 0) {
+                Double dValue = value * precision;
+                long lValue = Math.round(dValue);
+                dValue = lValue / (double) precision;
+                return String.valueOf(dValue);
+            }
+            else {
+                long lValue = Math.round(value);
+                Log.d(TAG, "lValue: " + lValue);
+                int dotPosition = String.valueOf(lValue).indexOf(".");
+                if (dotPosition != -1)
+                    return String.valueOf(lValue).substring(0, dotPosition);
+                else {
+                    return String.valueOf(value);
+                }
+            }
         }
     }
 }

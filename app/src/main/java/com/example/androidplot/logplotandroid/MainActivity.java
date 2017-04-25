@@ -167,7 +167,7 @@ public class MainActivity extends Activity {
 //        rulerStep =
 //        Log.i(TAG, "Y axis rulerStep: " + rulerStep);
 //        yAxis.rulerStep.setValue(rulerStep);
-        yAxis.rulerStep = Axis.findRulerStep(series.getYRange());
+        yAxis.rulerStep = Axis.findRulerStep(series.getYRange(), 5);
         yAxis.setWidth(2);
         yAxis.label.setText("Y Axis");
         yAxis.gridRulers.label.setVOffset(-yAxis.gridRulers.label.getSize()/2 + yAxis.gridRulers.getWidth());

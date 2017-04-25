@@ -40,34 +40,6 @@ public class AxisLinear extends Axis {
         if (answer == -1) {
             return answer;
         }
-
-//        if (Double.isInfinite(getMaxAxisRange())) {
-//            Log.e(TAG, "axis range not defined: infinity");
-//            return 0f;
-//        }
-//
-//        if (Double.isInfinite(getMaxAxisRange())) {
-//            Log.e(TAG, "axis range not defined: infinity");
-//            return 0f;
-//        }
-//
-//        if (getMinAxisRange() > getMaxAxisRange()) {
-//            Log.e(TAG, "minimum > maximum; limits for the axis range ill defined; review axis limits");
-//            return 0f;
-//        }
-//
-//        if (getPxLength() == 0f) {
-//            Log.e(TAG, "invalid value for axis length: 0px");
-//            return 0f;
-//        }
-//
-//        Log.d(TAG, "value: " + value);
-//        Log.d(TAG, "axisRange: " + getAxisRange());
-//        Log.d(TAG, "pxLength: " + getPxLength());
-//
-//        Log.d(TAG, "value in pixels:" + ((value - getMinAxisRange())* getPxLength() / getAxisRange()));
-//        Log.d(TAG, "minimum axis range: " + getMinAxisRange());
-
         // px = m*value + b; b = 0
         return (float) ((value - getMinAxisRange()) * getPxLength() / getAxisRange());
     }
@@ -92,8 +64,8 @@ public class AxisLinear extends Axis {
                     double firstStep = getMinAxisRange() + (rulerStep.getValue() - getMinAxisRange()% rulerStep.getValue());
                     Log.d(TAG, "first rulerStep ruler value position: " + firstStep);
 
-                    double rulerPosition = firstStep;
-                    float rulerPxPosition = scale(firstStep);
+                    double rulerPosition = firstStep; // position in data units
+                    float rulerPxPosition = scale(firstStep); // position in graphics units (pixels)
 
                     int i = 0; // fuse
                     while (true) {
