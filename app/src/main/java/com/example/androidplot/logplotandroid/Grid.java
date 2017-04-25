@@ -738,11 +738,10 @@ public class Grid implements Applyable{
 
     private void drawYGridRulerLabels(Axis yAxis, Paint paint, Canvas canvas) {
 
-        int i = 0;
+        int i = 1;
         for (Ruler ruler : yAxis.gridRulers.getRulers()) {
             if (i%(yAxis.gridRulers.getLabelSpacing())== 0) { // print label for each nth ruler
-//                        i = 1;
-//                        i++;
+
                 paint.setColor(ruler.label.getColor());
                 paint.setTextSize(spToPx(ruler.label.getSize()));
 
@@ -777,8 +776,6 @@ public class Grid implements Applyable{
         for (Ruler ruler : xAxis.gridRulers.getRulers()) {
             if (i%(xAxis.gridRulers.getLabelSpacing())== 0) { // print label for each nth ruler
 
-                Log.d(TAG, "iteration i: " + i);
-
                 paint.setColor(ruler.label.getColor());
                 paint.setTextSize(spToPx(ruler.label.getSize()));
 
@@ -793,9 +790,6 @@ public class Grid implements Applyable{
                     canvas.rotate(rotation, xPixel + paint.measureText(ruler.label.getText()), yPixel);
                 else
                     canvas.rotate(rotation, xPixel, yPixel);
-
-                Log.d(TAG, "ruler x coordinate: " + xPixel);
-                Log.d(TAG, "ruler label: " + ruler.label.getText());
 
                 canvas.drawText(
                         ruler.label.getText(),
