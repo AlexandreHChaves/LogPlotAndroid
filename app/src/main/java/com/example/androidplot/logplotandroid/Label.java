@@ -80,6 +80,12 @@ public class Label {
         return angle;
     }
 
+    /**
+     * @param angle the angle in degrees for the label to be represented in the graphic. <br>
+     *              * from -90 to +90 <br>
+     *              * Positive angle has clock wise direction <br>
+     *              * 0 degrees is horizontal (default)
+     */
     public void setAngle(float angle) {
         this.angle = angle;
     }

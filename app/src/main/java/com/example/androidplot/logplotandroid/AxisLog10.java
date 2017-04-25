@@ -78,21 +78,17 @@ public class AxisLog10 extends Axis{
 
             final int MAX_INTERACTIONS = 1000;
 
-            RulerStep bigRulerStep = new RulerStep();
             RulerStep rulerStep = new RulerStep();
-
-            bigRulerStep.setValue(firstMajorRulerStep.getValue());
-            bigRulerStep.setPrecision(firstMajorRulerStep.getPrecision());
-
             rulerStep.setValue(firstMajorRulerStep.getValue()/10d);
-            rulerStep.setPrecision(bigRulerStep.getPrecision() + 1);
-
-            float rulerPxPosition = 0;
+            rulerStep.setPrecision(firstMajorRulerStep.getPrecision() + 1);
 
             if (getAxisRange() <= rulerStep.getValue()) {
                 Log.e(TAG, "the rulerStep chosen for the AxisLog10 is to large");
                 return;
             }
+
+            float rulerPxPosition = scale(rulerStep.getValue());
+            float minPxPosition = scale(getMinAxisRange());
 
             int fuse = 0;
             int k = 0; // counter for the big rulers
@@ -103,8 +99,8 @@ public class AxisLog10 extends Axis{
                 if (fuse++ == MAX_INTERACTIONS) { // cycle fuse
                     gridRulers.getRulers().clear();
                     Log.e(TAG, "cycle to assign rulers blew up; \n" +
-                                    "maybe rulerStep to short for the axis;\n" +
-                                    "rulers cleared out"
+                            "maybe rulerStep to short for the axis;\n" +
+                            "rulers cleared out"
                     );
                     break;
                 }
@@ -114,24 +110,23 @@ public class AxisLog10 extends Axis{
                 if (j == 10) { // each tenth ruler the scale is changed
                     j = 1;
                     ruler = new MajorRuler();
-                    k++;
-                    bigRulerStep.setValue(firstMajorRulerStep.getValue() * Math.pow(10, k));
-
-                    rulerStep.setValue(bigRulerStep.getValue() / 10);
+                    rulerStep.setValue(firstMajorRulerStep.getValue() * Math.pow(10, k));
                     rulerStep.setPrecision(Math.max(rulerStep.getPrecision() - 1, firstMajorRulerStep.getPrecision()));
 
                     if (rulerStep.getValue() > getMaxAxisRange()) {
                         Log.w(TAG, "ruler position stopped by outer of range value");
                         break;
                     }
-
+                    k++;
                 } else {
                     ruler = new MinorRuler();
                 }
 
-                ruler.setPxPosition(rulerPxPosition);
-                ruler.label.setText(rulerStep.getStringValue(rulerStep.getValue() * j));
-                gridRulers.addRuler(ruler);
+                if (rulerPxPosition > minPxPosition) {
+                    ruler.setPxPosition(rulerPxPosition);
+                    ruler.label.setText(rulerStep.getStringValue(rulerStep.getValue() * j));
+                    gridRulers.addRuler(ruler);
+                }
 
                 rulerPxPosition = scale(rulerStep.getValue() * ++j);
             }

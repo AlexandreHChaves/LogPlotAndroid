@@ -536,143 +536,28 @@ public class Grid implements Applyable{
                     paint
             );
 
-            if (xAxis.label.hasText()) {
-                paint.setTextSize(spToPx(xAxis.label.getSize()));
-                if (xAxis.label.getVOffset() < ZERO_F) {
-                    setBottomTextBorder(getBottomTextBorder() - xAxis.label.getVOffset() + paint.getTextSize() + xAxis.getWidth());
-                } else {
-                    setBottomTextBorder(getBottomTextBorder() + paint.getTextSize() + xAxis.getWidth());
-                }
-            }
-
-            if (xAxis.gridRulers.label.getVOffset() < ZERO_F) {
-                setBottomTextBorder(getBottomTextBorder() - xAxis.gridRulers.label.getVOffset());
-            }
-
-            if (yAxis.label.hasText()) {
-                paint.setTextSize(spToPx(yAxis.label.getSize()));
-
-                if (yAxis.label.getHOffset() < ZERO_F) {
-                    setLeftTextBorder(getLeftTextBorder() - yAxis.label.getHOffset() + paint.getTextSize() + yAxis.getWidth());
-                } else {
-                    setLeftTextBorder(getLeftTextBorder() + paint.getTextSize() +  yAxis.getWidth());
-                }
-            }
-
-            if (yAxis.gridRulers.label.getHOffset() < ZERO_F) {
-                setLeftTextBorder(getLeftTextBorder() - yAxis.gridRulers.label.getHOffset());
-            }
-
-            xAxis.setPxLength(
-                    canvas.getWidth() -
-                            dpToPx(getLeftBorder()) -
-                            dpToPx(getLeftTextBorder()) -
-                            dpToPx(getRightBorder()) -
-                            dpToPx(getRightTextBorder())
-            );
-            yAxis.setPxLength(
-                    canvas.getHeight() -
-                            dpToPx(getTopBorder()) -
-                            dpToPx(getTopTextBorder()) -
-                            dpToPx(getBottomBorder()) -
-                            dpToPx(getBottomTextBorder())
-            );
-
-            xAxis.apply(); // evaluates rulers position in the axis in pixel units
-            yAxis.apply();
+            applyGridMetrics(xAxis, yAxis, paint, canvas);
 
             // drawing rulers of y axis, rulers parallel to x axis
             if (yAxis.hasGridRulers()) {
-                int i = 0;
-                for (Ruler ruler : yAxis.gridRulers.getRulers()) {
-                    paint.setColor(ruler.getColor());
-                    paint.setStrokeWidth(ruler.getWidth());
-
-                    drawHorizontalRuler(
-                            canvas,
-                            ruler,
-                            xAxis,
-                            paint
-                    );
-
-                    if (i%(yAxis.gridRulers.getLabelSpacing())== 0) { // print label for each nth ruler
-//                        i = 1;
-//                        i++;
-                        paint.setColor(ruler.label.getColor());
-                        paint.setTextSize(spToPx(ruler.label.getSize()));
-
-                        canvas.drawText(
-                                ruler.label.getText(),
-                                xPx(dpToPx(ruler.label.getHOffset())),
-                                yPx(ruler.getPxPosition() + dpToPx(ruler.label.getVOffset())),
-                                paint
-                        );
-                    }
-                    i++;
-                }
+                drawYGridRulers(xAxis, yAxis, paint, canvas);
+                drawYGridRulerLabels(yAxis, paint, canvas);
             } else {
-                Log.d(TAG, "yAxis has NO rulers");
+                Log.i(TAG, "yAxis has NO rulers");
             }
 
             // drawing rulers of x axis, rulers parallel to y axis
             if (xAxis.hasGridRulers()) {
-                int i = 0;
-                for (Ruler ruler : xAxis.gridRulers.getRulers()) {
-                    paint.setColor(ruler.getColor());
-                    paint.setStrokeWidth(dpToPx(ruler.getWidth()));
-
-                    drawVerticalRuler(
-                            canvas,
-                            ruler,
-                            yAxis,
-                            paint
-                    );
-
-//                    Log.i(TAG, "label value: " + ruler.label.getText());
-//                    Log.i(TAG, "i: " + i);
-                    if (i%(xAxis.gridRulers.getLabelSpacing()) == 0) { // print label for each nth ruler
-//                    if (i%10 == 0) { // print label for each nth ruler
-//                        i = 1;
-//                        Log.i(TAG, "i: " + i);
-//                        Log.i(TAG, "i%xAxis.gridRulers.getLabelSpacing(): " + i%xAxis.gridRulers.getLabelSpacing());
-//                        Log.i(TAG, "label value: " + ruler.label.getText());
-                        paint.setColor(ruler.label.getColor());
-                        paint.setTextSize(spToPx(ruler.label.getSize()));
-                        canvas.drawText(
-                                ruler.label.getText(),
-                                xPx(ruler.getPxPosition() + dpToPx(ruler.label.getHOffset())),
-                                yPx(dpToPx(ruler.label.getVOffset())),
-                                paint
-                        );
-                    }
-                    i++;
-                }
+                drawXGridRulers(xAxis, yAxis, paint, canvas);
+                drawXGridRulerLabels(xAxis, paint, canvas);
             } else {
                 Log.i(TAG, "xAxis has NO rulers");
             }
 
             // drawing personal rulers on y axis
             if (yAxis.hasUserRulers()) {
-                for (Ruler ruler : yAxis.userRulers.getRulers()) {
-                    paint.setColor(ruler.getColor());
-                    paint.setStrokeWidth(ruler.getWidth());
-
-                    drawHorizontalRuler(
-                            canvas,
-                            ruler,
-                            xAxis,
-                            paint
-                    );
-
-                    paint.setColor(ruler.label.getColor());
-                    paint.setTextSize(spToPx(ruler.label.getSize()));
-                    canvas.drawText(
-                            ruler.label.getText(),
-                            xPx(dpToPx(ruler.label.getHOffset())),
-                            yPx(ruler.getPxPosition() + dpToPx(ruler.label.getVOffset())),
-                            paint
-                    );
-                }
+                drawYAxisUserRulers(xAxis, yAxis, paint, canvas);
+                drawUserRulerLabels(yAxis, paint, canvas);
             } else {
                 printLog(METHOD_NAME);
                 printLog("y axis has no personal rulers");
@@ -680,93 +565,264 @@ public class Grid implements Applyable{
 
             // drawing personal rulers on x axis
             if (xAxis.hasUserRulers()) {
-                for (Ruler ruler : xAxis.userRulers.getRulers()) {
-                    paint.setColor(ruler.getColor());
-                    paint.setStrokeWidth(dpToPx(ruler.getWidth()));
-
-                    drawVerticalRuler(
-                            canvas,
-                            ruler,
-                            yAxis,
-                            paint
-                    );
-//                    canvas.drawLine(
-//                            xPx(ruler.getPxPosition()),
-//                            yPx(ZERO_F),
-//                            xPx(ruler.getPxPosition()) ,
-//                            yPx(yAxis.getPxLength()),
-//                            paint
-//                    );
-                    paint.setColor(ruler.label.getColor());
-                    paint.setTextSize(spToPx(ruler.label.getSize()));
-                    canvas.drawText(
-                            ruler.label.getText(),
-                            xPx(ruler.getPxPosition() + dpToPx(ruler.label.getHOffset())),
-                            yPx(dpToPx(ruler.label.getVOffset())),
-                            paint
-                    );
-                }
+                drawXAxisUserRulers(xAxis, yAxis, paint, canvas);
+                drawUserRulerLabels(xAxis, paint, canvas);
             } else {
                 printLog(METHOD_NAME);
                 printLog("x axis has no personal rulers");
             }
 
             // drawing xAxis
-            paint.setColor(getXAxis().getColor());
-            paint.setStrokeWidth(dpToPx(getXAxis().getWidth()));
-            canvas.drawLine(
-                    xPx(getXAxis().getPxPosition()),
-                    yPx(getYAxis().getPxPosition()),
-                    xPx(getXAxis().getPxLength()),
-                    yPx(getYAxis().getPxPosition()),
-                    paint
-            );
-
-            if (xAxis.label.hasText()) {
-                canvas.save();
-                paint.setTextSize(spToPx(xAxis.label.getSize()));
-                paint.setColor(xAxis.label.getColor());
-
-                float yOffset = dpToPx(getBottomTextBorder()) - 0.4f*paint.getTextSize(); // 40% of the text size to stick to the bottom edge
-
-                Path path = new Path();
-                path.moveTo(xPx(ZERO_F), yPx(ZERO_F));
-                path.lineTo(xPx(xAxis.getPxLength()), yPx(ZERO_F));
-                paint.setStyle(Paint.Style.FILL);
-                paint.setTextAlign(Paint.Align.CENTER);
-                canvas.drawTextOnPath(xAxis.label.getText(), path, ZERO_F, yOffset, paint);
-                canvas.restore();
-            }
+            drawXAxis(xAxis, paint, canvas);
 
             // drawing yAxis
-            paint.setColor(getYAxis().getColor());
-            paint.setStrokeWidth(dpToPx(getYAxis().getWidth()));
-            canvas.drawLine(
-                    xPx(getXAxis().getPxPosition()),
-                    yPx(getYAxis().getPxPosition()),
-                    xPx(getXAxis().getPxPosition()),
-                    yPx(getYAxis().getPxLength()),
-                    paint
-            );
-
-            if (yAxis.label.hasText()) {
-                canvas.save();
-                paint.setTextSize(spToPx(yAxis.label.getSize()));
-                paint.setColor(yAxis.label.getColor());
-
-                float xOffset = - dpToPx(getLeftTextBorder()) + paint.getTextSize()*0.9f; // 90% of the text size to stick to the left border edge
-
-                Path path = new Path();
-                path.moveTo(xPx(ZERO_F), yPx(ZERO_F));
-                path.lineTo(xPx(ZERO_F), yPx(yAxis.getPxLength()));
-                paint.setStyle(Paint.Style.FILL);
-                paint.setTextAlign(Paint.Align.CENTER);
-                canvas.drawTextOnPath(yAxis.label.getText(), path, ZERO_F, xOffset, paint);
-                canvas.restore();
-            }
+            drawYAxis(yAxis, paint, canvas);
         }
     }
 
+    private void applyGridMetrics(Axis xAxis, Axis yAxis, Paint paint, Canvas canvas) {
+        if (xAxis.label.hasText()) {
+            paint.setTextSize(spToPx(xAxis.label.getSize()));
+            if (xAxis.label.getVOffset() < ZERO_F) {
+                setBottomTextBorder(getBottomTextBorder() - xAxis.label.getVOffset() + paint.getTextSize() + xAxis.getWidth());
+            } else {
+                setBottomTextBorder(getBottomTextBorder() + paint.getTextSize() + xAxis.getWidth());
+            }
+        }
+
+        // setting border for the rotation labels
+        paint.setTextSize(xAxis.gridRulers.label.getSize());
+        float rotationEffect = paint.measureText("100.0") * // sample text
+                (float) Math.sin(Math.abs(xAxis.gridRulers.label.getAngle()));
+        setBottomTextBorder(getBottomTextBorder() + rotationEffect);
+
+        if (xAxis.gridRulers.label.getVOffset() < ZERO_F) {
+            setBottomTextBorder(getBottomTextBorder() - xAxis.gridRulers.label.getVOffset());
+        }
+
+        if (yAxis.label.hasText()) {
+            paint.setTextSize(spToPx(yAxis.label.getSize()));
+
+            if (yAxis.label.getHOffset() < ZERO_F) {
+                setLeftTextBorder(getLeftTextBorder() - yAxis.label.getHOffset() + paint.getTextSize() + yAxis.getWidth());
+            } else {
+                setLeftTextBorder(getLeftTextBorder() + paint.getTextSize() +  yAxis.getWidth());
+            }
+        }
+
+        if (yAxis.gridRulers.label.getHOffset() < ZERO_F) {
+            setLeftTextBorder(getLeftTextBorder() - yAxis.gridRulers.label.getHOffset());
+        }
+
+        xAxis.setPxLength(
+                canvas.getWidth() -
+                        dpToPx(getLeftBorder()) -
+                        dpToPx(getLeftTextBorder()) -
+                        dpToPx(getRightBorder()) -
+                        dpToPx(getRightTextBorder())
+        );
+        yAxis.setPxLength(
+                canvas.getHeight() -
+                        dpToPx(getTopBorder()) -
+                        dpToPx(getTopTextBorder()) -
+                        dpToPx(getBottomBorder()) -
+                        dpToPx(getBottomTextBorder())
+        );
+
+        xAxis.apply(); // evaluates rulers position in the axis in pixel units
+        yAxis.apply();
+    }
+
+    private void drawXAxis(Axis xAxis, Paint paint, Canvas canvas) {
+        paint.setColor(getXAxis().getColor());
+        paint.setStrokeWidth(dpToPx(getXAxis().getWidth()));
+        canvas.drawLine(
+                xPx(getXAxis().getPxPosition()),
+                yPx(getYAxis().getPxPosition()),
+                xPx(getXAxis().getPxLength()),
+                yPx(getYAxis().getPxPosition()),
+                paint
+        );
+
+        if (xAxis.label.hasText()) {
+            canvas.save();
+            paint.setTextSize(spToPx(xAxis.label.getSize()));
+            paint.setColor(xAxis.label.getColor());
+
+            float yOffset = dpToPx(getBottomTextBorder()) - 0.4f*paint.getTextSize(); // 40% of the text size to stick to the bottom edge
+
+            Path path = new Path();
+            path.moveTo(xPx(ZERO_F), yPx(ZERO_F));
+            path.lineTo(xPx(xAxis.getPxLength()), yPx(ZERO_F));
+            paint.setStyle(Paint.Style.FILL);
+            paint.setTextAlign(Paint.Align.CENTER);
+            canvas.drawTextOnPath(xAxis.label.getText(), path, ZERO_F, yOffset, paint);
+            canvas.restore();
+        }
+    }
+
+    private void drawYAxis(Axis yAxis, Paint paint, Canvas canvas) {
+        paint.setColor(getYAxis().getColor());
+        paint.setStrokeWidth(dpToPx(getYAxis().getWidth()));
+        canvas.drawLine(
+                xPx(getXAxis().getPxPosition()),
+                yPx(getYAxis().getPxPosition()),
+                xPx(getXAxis().getPxPosition()),
+                yPx(getYAxis().getPxLength()),
+                paint
+        );
+
+        if (yAxis.label.hasText()) {
+            canvas.save();
+            paint.setTextSize(spToPx(yAxis.label.getSize()));
+            paint.setColor(yAxis.label.getColor());
+
+            float xOffset = - dpToPx(getLeftTextBorder()) + paint.getTextSize()*0.9f; // 90% of the text size to stick to the left border edge
+
+            Path path = new Path();
+            path.moveTo(xPx(ZERO_F), yPx(ZERO_F));
+            path.lineTo(xPx(ZERO_F), yPx(yAxis.getPxLength()));
+            paint.setStyle(Paint.Style.FILL);
+            paint.setTextAlign(Paint.Align.CENTER);
+            canvas.drawTextOnPath(yAxis.label.getText(), path, ZERO_F, xOffset, paint);
+            canvas.restore();
+        }
+    }
+
+    private void drawXAxisUserRulers(Axis xAxis, Axis yAxis, Paint paint, Canvas canvas) {
+        for (Ruler ruler : xAxis.userRulers.getRulers()) {
+
+            drawVerticalRuler(
+                    canvas,
+                    ruler,
+                    yAxis,
+                    paint
+            );
+        }
+    }
+
+    private void drawYAxisUserRulers(Axis xAxis, Axis yAxis, Paint paint, Canvas canvas) {
+        for (Ruler ruler : yAxis.userRulers.getRulers()) {
+            drawHorizontalRuler(
+                    canvas,
+                    ruler,
+                    xAxis,
+                    paint
+            );
+        }
+    }
+
+    private void drawUserRulerLabels(Axis axis, Paint paint, Canvas canvas) {
+        for (Ruler ruler : axis.userRulers.getRulers()) {
+            paint.setColor(ruler.label.getColor());
+            paint.setTextSize(spToPx(ruler.label.getSize()));
+            canvas.drawText(
+                    ruler.label.getText(),
+                    xPx(dpToPx(ruler.label.getHOffset())),
+                    yPx(ruler.getPxPosition() + dpToPx(ruler.label.getVOffset())),
+                    paint
+            );
+        }
+    }
+
+    private void drawYGridRulers(Axis xAxis, Axis yAxis, Paint paint, Canvas canvas) {
+        for (Ruler ruler : yAxis.gridRulers.getRulers()) {
+            drawHorizontalRuler(
+                    canvas,
+                    ruler,
+                    xAxis,
+                    paint
+            );
+        }
+    }
+
+    private void drawYGridRulerLabels(Axis yAxis, Paint paint, Canvas canvas) {
+
+        int i = 0;
+        for (Ruler ruler : yAxis.gridRulers.getRulers()) {
+            if (i%(yAxis.gridRulers.getLabelSpacing())== 0) { // print label for each nth ruler
+//                        i = 1;
+//                        i++;
+                paint.setColor(ruler.label.getColor());
+                paint.setTextSize(spToPx(ruler.label.getSize()));
+
+                float xPixel = xPx(dpToPx(ruler.label.getHOffset()));
+                float yPixel = yPx(ruler.getPxPosition() + dpToPx(ruler.label.getVOffset()));
+
+                canvas.save();
+                canvas.rotate(
+                        yAxis.gridRulers.label.getAngle(), // rotation angle
+                        xPixel + paint.measureText(ruler.label.getText()), // x coordinate + length of string
+                        yPixel // y coordinate
+                );
+
+                canvas.drawText(
+                        ruler.label.getText(),
+                        xPixel,
+                        yPixel,
+                        paint
+                );
+
+                canvas.restore();
+            }
+            i++;
+        }
+    }
+
+    private void drawXGridRulerLabels(Axis xAxis, Paint paint, Canvas canvas) {
+
+        Log.i(TAG, ".................. drawXGridRulerLabels() ....................");
+
+        int i = 1;
+        for (Ruler ruler : xAxis.gridRulers.getRulers()) {
+            if (i%(xAxis.gridRulers.getLabelSpacing())== 0) { // print label for each nth ruler
+
+                Log.d(TAG, "iteration i: " + i);
+
+                paint.setColor(ruler.label.getColor());
+                paint.setTextSize(spToPx(ruler.label.getSize()));
+
+                float xPixel = xPx(ruler.getPxPosition() + dpToPx(ruler.label.getHOffset()));
+                float yPixel = yPx(dpToPx(ruler.label.getVOffset()));
+
+                canvas.save();
+
+                float rotation = xAxis.gridRulers.label.getAngle();
+
+                if (rotation < 0)
+                    canvas.rotate(rotation, xPixel + paint.measureText(ruler.label.getText()), yPixel);
+                else
+                    canvas.rotate(rotation, xPixel, yPixel);
+
+                Log.d(TAG, "ruler x coordinate: " + xPixel);
+                Log.d(TAG, "ruler label: " + ruler.label.getText());
+
+                canvas.drawText(
+                        ruler.label.getText(),
+                        xPixel,
+                        yPixel,
+                        paint
+                );
+
+                canvas.restore();
+            }
+            i++;
+        }
+    }
+
+    private void drawXGridRulers(Axis xAxis, Axis yAxis, Paint paint, Canvas canvas) {
+        for (Ruler ruler : xAxis.gridRulers.getRulers()) {
+            paint.setColor(ruler.getColor());
+            paint.setStrokeWidth(dpToPx(ruler.getWidth()));
+
+            drawVerticalRuler(
+                    canvas,
+                    ruler,
+                    yAxis,
+                    paint
+            );
+        }
+    }
     private void drawVerticalRuler(
             Canvas canvas,
             Ruler ruler,

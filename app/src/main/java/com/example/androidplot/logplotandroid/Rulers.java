@@ -134,7 +134,7 @@ public class Rulers extends Ruler{
     /**
      * Specifies the periodicity to print a ruler label. ex: <br>
      *     setLabelSpacing(3); each 3rd ruler will have its label printed
-     * <p>If you use a AxisLog10 scale for you axis, you may want to assign:<br>
+     * <p>If you use a AxisLog10 scale for your axis, you may want to assign:<br>
      *     setLabelSpacing(9); this will print a ruler's label on each major ruler, the others will be left unprinted <br>
      *
      * @param labelSpacing integer defining the periodicity to print ruler's label
